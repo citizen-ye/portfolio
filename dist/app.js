@@ -1,7 +1,7 @@
 const items = {
- jangbumi: ['장부미', 'OCR 기능을 개발하고, Python 백엔드 전환과 배포 자동화를 담당했습니다.'],
- adclear: ['AD-CLEAR', '데이터 저장부터 근거 검색까지, 광고 판정의 흐름을 연결했습니다.'],
- jjirit: ['찌릿', '데이터의 한계를 분석하고, 서비스 입력부터 회귀 모델까지 설계했습니다.']
+ jangbumi: ['장부미', 'PaddleOCR 영수증 인식과 Azure 배포·운영을 연결했습니다.'],
+ adclear: ['AD-CLEAR', 'Azure AI Search의 근거 검색을 구축하고, AI 판정과 출처를 데이터로 연결했습니다.'],
+ jjirit: ['찌릿', '계절·불쾌지수 피처와 회귀 모델을 설계하고, 오차와 사용자 범위를 함께 평가했습니다.']
 };
 const buttons = [...document.querySelectorAll('.file')];
 function select(key) {
@@ -9,7 +9,7 @@ function select(key) {
  buttons.forEach(b => {const active = b.dataset.project === key; b.classList.toggle('active',active); b.setAttribute('aria-pressed',String(active));});
  document.getElementById('screen-title').textContent = items[key][0];
  document.getElementById('screen-description').textContent = items[key][1];
- const link = document.getElementById('open-project'); link.href = '#' + key; link.setAttribute('aria-label',items[key][0]+' 프로젝트로 이동');
+ const link = document.getElementById('open-project'); link.href = '#' + (key === 'adclear' ? 'project-rag' : key); link.setAttribute('aria-label',items[key][0]+' 프로젝트로 이동');
 }
 buttons.forEach((b,i) => {
  b.addEventListener('click',()=>select(b.dataset.project));
@@ -28,7 +28,7 @@ const projectMedia = {
 };
 
 function createProjectMedia(article) {
-  const key = article.id;
+  const key = article.dataset.projectKey || article.id;
   const media = projectMedia[key];
   const architecture = [...article.querySelectorAll(':scope > .project-image')];
   if (!media || architecture.length === 0) return;
@@ -50,7 +50,7 @@ function createProjectMedia(article) {
     </div>
     <div class="media-panel demo-panel ${media.ratio}" role="tabpanel" id="${key}-demo" aria-labelledby="${key}-demo-tab">
       <div class="video-frame">
-        <video controls preload="none" playsinline poster="assets/${key}-poster.jpg" aria-label="${media.name} 팀 프로젝트 서비스 시연">
+        <video controls preload="none" muted playsinline poster="assets/${key}-poster.jpg" aria-label="${media.name} 팀 프로젝트 서비스 시연">
           <source src="assets/${key}-web.mp4" type="video/mp4">
           <a href="assets/${key}-web.mp4">영상 파일 열기</a>
         </video>
@@ -112,7 +112,7 @@ function enhanceJjiritDetails() {
       <header class="case-intro">
         <p class="case-kicker">MY ROLE / MACHINE LEARNING</p>
         <h4>고객번호 없이도 예측할 수 있는 입력과 모델을 설계했습니다.</h4>
-        <p>월별 전력 데이터의 한계를 분석하고, 사용자가 답할 수 있는 에어컨 사용시간을 모델 입력으로 연결했습니다.</p>
+        <p>월별 데이터를 분석해 입력값을 설계하고, 월의 sin·cos 변환과 불쾌지수 THI로 피처를 구성했습니다. Boosted Decision Tree Regression을 선택한 뒤 MAE·RMSE·R²와 서비스 대상 범위를 함께 검토했습니다.</p>
         <div class="role-strip" aria-label="담당 범위"><span>데이터 분석</span><span>입력 피처 설계</span><span>알고리즘 선정</span><span>모델 평가</span></div>
       </header>
 
@@ -147,7 +147,7 @@ function enhanceJjiritDetails() {
 }
 
 function enhanceAdclearDetails() {
-  const details = document.querySelector('#adclear details');
+  const details = document.querySelector('#project-rag details');
   if (!details) return;
 
   details.innerHTML = `
@@ -155,9 +155,9 @@ function enhanceAdclearDetails() {
     <div class="adclear-case-study">
       <header class="case-intro">
         <p class="case-kicker">MY ROLE / BACKEND DATA &amp; RAG</p>
-        <h4>검색할 근거를 만들고, 판정 결과를 저장하는 데이터 계층을 구축했습니다.</h4>
-        <p>15개 테이블 설계와 판정 결과 저장, 마스터 동기화를 맡았습니다. 데이터 정규화와 Azure AI Search 인덱싱·RAG 배포에도 공동으로 참여했습니다.</p>
-        <div class="role-strip" aria-label="담당 범위"><span>DB 설계·저장 구현</span><span>마스터 동기화</span><span>데이터 정규화 · 공동</span><span>RAG 배포 · 공동</span></div>
+        <h4>광고 문구에서 법적 근거를 찾는 RAG 데이터 기반을 구축했습니다.</h4>
+        <p>데이터 정규화와 Azure AI Search 인덱싱·RAG 배포에 공동 참여하고, 중첩 JSON으로 발생한 검색 문제를 해결했습니다. 검색한 근거와 AI 판정을 추적할 수 있도록 15개 테이블 설계·트랜잭션 저장·마스터 동기화도 맡았습니다.</p>
+        <div class="role-strip" aria-label="담당 범위"><span>데이터 정규화 · 공동</span><span>RAG 배포 · 공동</span><span>DB 설계·저장 구현</span><span>마스터 동기화</span></div>
         <div class="tags"><span>PostgreSQL</span><span>asyncpg</span><span>FastAPI</span><span>Pydantic</span><span>Azure Blob Storage</span><span>Azure AI Search</span></div>
       </header>
 
@@ -167,8 +167,9 @@ function enhanceAdclearDetails() {
       </section>
 
       <section id="adclear-rag" class="case-step ad-section">
-        <div class="case-copy"><span class="step-index">02 / RAG DEPLOYMENT</span><h4>Azure AI Search 인덱싱·RAG 배포</h4><p>법령·사례·판례 인덱스 구성과 인덱싱, RAG 배포에 공동 참여했습니다. 정규화한 본문과 벡터 필드를 연결하고 실제 광고 문구로 관련 근거가 검색되는지 확인했습니다.</p></div>
-        <ol class="read-flow"><li><span class="flow-number">01</span><strong>정규화 JSON</strong><small>검색할 본문과 참조 ID</small></li><li><span class="flow-number">02</span><strong>벡터화·인덱싱</strong><small>Azure AI Search</small></li><li><span class="flow-number">03</span><strong>근거 검색</strong><small>광고 문구에 관련된 법령 반환</small></li></ol>
+        <div class="case-copy"><span class="step-index">02 / RAG DEPLOYMENT</span><h4>Azure AI Search 인덱싱·RAG 배포</h4><p>법령·사례·판례 인덱스 구성과 인덱싱, RAG 배포에 공동 참여했습니다. 정규화한 본문과 벡터 필드를 연결하고 실제 광고 문구로 관련 근거가 검색되는지 확인했습니다.</p><p>팀 공용 스키마는 검색 본문 <code>text</code>를 <code>text-embedding-3-large</code>로 변환해 3,072차원 <code>content_vector</code>에 담습니다. 텍스트는 한국어 분석기 <code>ko.lucene</code>로 검색하며, 팀 검색 설계는 BM25와 벡터 검색을 함께 사용해 단어 일치와 의미 유사성을 보완합니다.</p></div>
+        <ol class="read-flow"><li><span class="flow-number">01</span><strong>정규화 JSON</strong><small>검색할 본문과 참조 ID</small></li><li><span class="flow-number">02</span><strong>3,072차원 임베딩</strong><small>text-embedding-3-large</small></li><li><span class="flow-number">03</span><strong>키워드 + 벡터 검색</strong><small>Azure AI Search · 관련 근거 반환</small></li></ol>
+        <div class="decision-note wide"><b>검색 단위</b><span>법령·사례·판례는 근거 종류로 구분합니다. 공용 스키마는 식품표시광고법 제8조를 ‘호’ 단위로 나누어 ‘질병 예방·치료’, ‘의약품 오인’ 같은 규칙을 개별 근거로 찾도록 정리했습니다. 사례에는 여러 법령을 연결할 수 있는 law_refs 배열을 둡니다.</span></div>
       </section>
 
       <section id="adclear-search-fix" class="case-step ad-section">

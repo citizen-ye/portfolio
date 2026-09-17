@@ -13,7 +13,7 @@ for (const asset of ['adclear.svg', 'adclear-data-layer.svg', 'adclear-source-no
   assert.ok(info.size > 1000, `${asset} must contain a real visual asset`);
 }
 
-assert.match(html, /id="adclear"[\s\S]*adclear-data-layer\.svg/);
+assert.match(html, /id="project-rag"[\s\S]*adclear-data-layer\.svg/);
 assert.match(app, /function enhanceAdclearDetails\(\)/);
 assert.match(app, /class="adclear-case-study"/);
 for (const id of ['adclear-normalize', 'adclear-rag', 'adclear-search-fix', 'adclear-model', 'adclear-persist', 'adclear-sync']) {

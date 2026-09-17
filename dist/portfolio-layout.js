@@ -43,6 +43,7 @@
   function schedule(){if(!pending){pending=true;requestAnimationFrame(update);}}
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   function reveal(hash,focus=false){
+    if(hash==='#adclear')hash='#project-rag';
     let target;
     try{target=document.getElementById(decodeURIComponent(hash.slice(1)));}catch{return;}
     if(!target)return;
