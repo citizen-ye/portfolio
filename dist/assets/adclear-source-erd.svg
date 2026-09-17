@@ -1,0 +1,233 @@
+<svg style="background:#0c0e1a;
+  --paper:#0c0e1a; --paper-2:#12152670; --paper-2-solid:#141833; --ink:#eceaf7; --ink-2:#b3aecf;
+  --muted:#8580a6; --line:#2a2d4d; --line-2:#3c4070;
+  --brand:#9b8cff; --brand-soft:#241f52;
+  --danger:#ff8a80; --danger-soft:#3a1930;
+  --warn:#ffcc80; --warn-soft:#3a2c15;
+  --pass:#7de3b8; --pass-soft:#0f3329;
+  --azure:#7fc9ff; --azure-soft:#132a44;
+  --onprem:#c9bfff; --onprem-soft:#221f3d;
+" viewBox="0 0 1500 860" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AD신호등 전체 DB ERD">
+<defs>
+  <marker id="arAz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--azure)"></path></marker>
+  <marker id="arWn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--warn)"></path></marker>
+  <marker id="arMu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"></path></marker>
+  <marker id="arDg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"></path></marker>
+</defs>
+<style>
+  .tbl-h{font:800 12.5px 'JetBrains Mono',ui-monospace,monospace;fill:var(--ink)}
+  .tbl-r{font:11px 'JetBrains Mono',ui-monospace,monospace;fill:var(--ink-2)}
+  .tbl-pk{font:11px 'JetBrains Mono',ui-monospace,monospace;fill:var(--warn)}
+  .tbl-fk{font:11px 'JetBrains Mono',ui-monospace,monospace;fill:var(--azure)}
+  .tbl-warn{font:11px 'JetBrains Mono',ui-monospace,monospace;fill:var(--danger)}
+  .grp{font:700 11px 'JetBrains Mono',ui-monospace,monospace;fill:var(--muted);letter-spacing:.08em}
+  .lbl{font:10.5px 'JetBrains Mono',ui-monospace,monospace;fill:var(--muted)}
+  .box{fill:var(--paper-2-solid);stroke:var(--line-2);stroke-width:1.4}
+  .boxD{fill:var(--paper-2-solid);stroke:var(--danger);stroke-width:1.4;stroke-dasharray:5 3}
+  .hd{fill:var(--brand-soft)}
+  .hdD{fill:var(--danger-soft)}
+</style>
+
+<!-- group labels -->
+<text class="grp" x="20" y="38">AUTH (auth.py)</text>
+<text class="grp" x="290" y="38">CORE 스크리닝 파이프라인 (core.py)</text>
+<text class="grp" x="290" y="428">core.py 자식 테이블 + quality.py</text>
+<text class="grp" x="290" y="578">MASTER 캐시 (master.py)</text>
+<text class="grp" x="1210" y="38">screening_history.py</text>
+<text class="grp" x="1210" y="288">traffic_metric.py</text>
+
+<!-- ================= AUTH ================= -->
+<g>
+  <rect class="box" x="20" y="50" width="230" height="128" rx="8"></rect>
+  <rect class="hd" x="20" y="50" width="230" height="26" rx="8"></rect><rect class="hd" x="20" y="63" width="230" height="13"></rect>
+  <text class="tbl-h" x="30" y="67">users</text>
+  <text class="tbl-pk" x="30" y="90">PK id UUID</text>
+  <text class="tbl-r" x="30" y="108">email TEXT UNIQUE NOT NULL</text>
+  <text class="tbl-r" x="30" y="126">password_hash (OAuth전용 NULL)</text>
+  <text class="tbl-r" x="30" y="144">role DEFAULT 'user'</text>
+  <text class="tbl-r" x="30" y="162">created_at / updated_at</text>
+</g>
+<g>
+  <rect class="box" x="20" y="198" width="230" height="92" rx="8"></rect>
+  <rect class="hd" x="20" y="198" width="230" height="26" rx="8"></rect><rect class="hd" x="20" y="211" width="230" height="13"></rect>
+  <text class="tbl-h" x="30" y="215">oauth_identities</text>
+  <text class="tbl-pk" x="30" y="238">PK id UUID</text>
+  <text class="tbl-fk" x="30" y="256">FK user_id → users.id (CASCADE)</text>
+  <text class="tbl-r" x="30" y="274">UNIQUE(provider, provider_user_id)</text>
+</g>
+<g>
+  <rect class="box" x="20" y="310" width="230" height="110" rx="8"></rect>
+  <rect class="hd" x="20" y="310" width="230" height="26" rx="8"></rect><rect class="hd" x="20" y="323" width="230" height="13"></rect>
+  <text class="tbl-h" x="30" y="327">sessions</text>
+  <text class="tbl-pk" x="30" y="350">PK id UUID</text>
+  <text class="tbl-fk" x="30" y="368">FK user_id → users.id (CASCADE)</text>
+  <text class="tbl-r" x="30" y="386">token_hash TEXT UNIQUE</text>
+  <text class="tbl-r" x="30" y="404">expires_at / revoked_at(NULL=유효)</text>
+</g>
+
+<!-- ================= CORE spine ================= -->
+<g>
+  <rect class="box" x="290" y="50" width="210" height="110" rx="8"></rect>
+  <rect class="hd" x="290" y="50" width="210" height="26" rx="8"></rect><rect class="hd" x="290" y="63" width="210" height="13"></rect>
+  <text class="tbl-h" x="300" y="67">screening</text>
+  <text class="tbl-pk" x="300" y="90">PK id UUID</text>
+  <text class="tbl-fk" x="300" y="108">FK user_id → users.id (SET NULL)</text>
+  <text class="tbl-r" x="300" y="126">risk CHECK(RED/YELLOW/GREEN)</text>
+  <text class="tbl-r" x="300" y="144">out_of_scope→risk=GREEN 만 CHECK</text>
+</g>
+<g>
+  <rect class="box" x="290" y="180" width="210" height="92" rx="8"></rect>
+  <rect class="hd" x="290" y="180" width="210" height="26" rx="8"></rect><rect class="hd" x="290" y="193" width="210" height="13"></rect>
+  <text class="tbl-h" x="300" y="197">claim</text>
+  <text class="tbl-pk" x="300" y="220">PK id UUID</text>
+  <text class="tbl-fk" x="300" y="238">FK screening_id → screening.id (CASCADE)</text>
+  <text class="tbl-r" x="300" y="256">checkable BOOL DEFAULT TRUE</text>
+</g>
+<g>
+  <rect class="box" x="290" y="292" width="210" height="110" rx="8"></rect>
+  <rect class="hd" x="290" y="292" width="210" height="26" rx="8"></rect><rect class="hd" x="290" y="305" width="210" height="13"></rect>
+  <text class="tbl-h" x="300" y="309">judgment</text>
+  <text class="tbl-pk" x="300" y="332">PK id UUID</text>
+  <text class="tbl-fk" x="300" y="350">FK claim_id → claim.id UNIQUE(CASCADE)</text>
+  <text class="tbl-r" x="300" y="368">verdict CHECK(4값)</text>
+  <text class="tbl-r" x="300" y="386">types TEXT[] CHECK(5종 enum)</text>
+</g>
+
+<!-- children row -->
+<g>
+  <rect class="box" x="290" y="440" width="210" height="110" rx="8"></rect>
+  <rect class="hd" x="290" y="440" width="210" height="26" rx="8"></rect><rect class="hd" x="290" y="453" width="210" height="13"></rect>
+  <text class="tbl-h" x="300" y="457">judgment_evidence</text>
+  <text class="tbl-pk" x="300" y="480">PK id UUID</text>
+  <text class="tbl-fk" x="300" y="498">FK judgment_id → judgment.id (CASCADE)</text>
+  <text class="tbl-r" x="300" y="516">evidence_type CHECK(law/case/precedent)</text>
+  <text class="tbl-r" x="300" y="534">evidence_id TEXT (논리참조, FK 없음)</text>
+</g>
+<g>
+  <rect class="box" x="520" y="440" width="200" height="92" rx="8"></rect>
+  <rect class="hd" x="520" y="440" width="200" height="26" rx="8"></rect><rect class="hd" x="520" y="453" width="200" height="13"></rect>
+  <text class="tbl-h" x="530" y="457">suggestion</text>
+  <text class="tbl-pk" x="530" y="480">PK id UUID</text>
+  <text class="tbl-fk" x="530" y="498">FK judgment_id → judgment.id (CASCADE)</text>
+  <text class="tbl-r" x="530" y="516">UNIQUE(judgment_id, text)</text>
+</g>
+<g>
+  <rect class="box" x="740" y="440" width="200" height="92" rx="8"></rect>
+  <rect class="hd" x="740" y="440" width="200" height="26" rx="8"></rect><rect class="hd" x="740" y="453" width="200" height="13"></rect>
+  <text class="tbl-h" x="750" y="457">feedback</text>
+  <text class="lbl" x="750" y="469">quality.py · 실제 생성됨</text>
+  <text class="tbl-pk" x="750" y="480">PK id UUID</text>
+  <text class="tbl-fk" x="750" y="498">FK judgment_id → judgment.id (CASCADE)</text>
+  <text class="tbl-r" x="750" y="516">is_correct BOOL / reason_code</text>
+</g>
+<g>
+  <rect class="box" x="960" y="440" width="210" height="110" rx="8"></rect>
+  <rect class="hd" x="960" y="440" width="210" height="26" rx="8"></rect><rect class="hd" x="960" y="453" width="210" height="13"></rect>
+  <text class="tbl-h" x="970" y="457">guardrail_event</text>
+  <text class="tbl-pk" x="970" y="480">PK id UUID</text>
+  <text class="tbl-fk" x="970" y="498">FK judgment_id → judgment.id (CASCADE)</text>
+  <text class="tbl-r" x="970" y="516">attempt_no INT CHECK(≥1)</text>
+  <text class="tbl-r" x="970" y="534">detail JSONB / recovered BOOL</text>
+</g>
+
+<!-- master row -->
+<g>
+  <rect class="box" x="290" y="590" width="180" height="74" rx="8"></rect>
+  <rect class="hd" x="290" y="590" width="180" height="26" rx="8"></rect><rect class="hd" x="290" y="603" width="180" height="13"></rect>
+  <text class="tbl-h" x="300" y="607">law_master</text>
+  <text class="tbl-pk" x="300" y="630">PK id TEXT</text>
+  <text class="tbl-r" x="300" y="648">content TEXT</text>
+</g>
+<g>
+  <rect class="box" x="490" y="590" width="190" height="92" rx="8"></rect>
+  <rect class="hd" x="490" y="590" width="190" height="26" rx="8"></rect><rect class="hd" x="490" y="603" width="190" height="13"></rect>
+  <text class="tbl-h" x="500" y="607">case_master</text>
+  <text class="tbl-pk" x="500" y="630">PK id TEXT</text>
+  <text class="tbl-r" x="500" y="648">verdict TEXT</text>
+  <text class="tbl-r" x="500" y="666">content TEXT</text>
+</g>
+<g>
+  <rect class="box" x="700" y="590" width="230" height="110" rx="8"></rect>
+  <rect class="hd" x="700" y="590" width="230" height="26" rx="8"></rect><rect class="hd" x="700" y="603" width="230" height="13"></rect>
+  <text class="tbl-h" x="710" y="607">precedent_master</text>
+  <text class="tbl-pk" x="710" y="630">PK id TEXT</text>
+  <text class="tbl-r" x="710" y="648">case_id + chunk_no UNIQUE</text>
+  <text class="tbl-r" x="710" y="666">law_refs[] / prec_refs[] (FK없음)</text>
+  <text class="tbl-r" x="710" y="684">content TEXT</text>
+</g>
+
+<!-- ================= HISTORY ================= -->
+<g>
+  <rect class="box" x="1210" y="50" width="240" height="110" rx="8"></rect>
+  <rect class="hd" x="1210" y="50" width="240" height="26" rx="8"></rect><rect class="hd" x="1210" y="63" width="240" height="13"></rect>
+  <text class="tbl-h" x="1220" y="67">screening_history</text>
+  <text class="tbl-pk" x="1220" y="90">PK id UUID</text>
+  <text class="tbl-fk" x="1220" y="108">FK user_id → users.id (CASCADE)</text>
+  <text class="tbl-r" x="1220" y="126">screening_id (FK 아님, 논리참조)</text>
+  <text class="tbl-r" x="1220" y="144">claims_snapshot JSONB</text>
+</g>
+<g>
+  <rect class="boxD" x="1210" y="180" width="240" height="92" rx="8"></rect>
+  <rect class="hdD" x="1210" y="180" width="240" height="26" rx="8"></rect><rect class="hdD" x="1210" y="193" width="240" height="13"></rect>
+  <text class="tbl-h" x="1220" y="197">feedback ⚠</text>
+  <text class="lbl" x="1220" y="209">screening_history_feedback.py 의도</text>
+  <text class="tbl-warn" x="1220" y="220">(의도) FK screening_history_id</text>
+  <text class="tbl-r" x="1220" y="238">claim_index INT</text>
+  <text class="tbl-warn" x="1220" y="256">⚠ 실제 테이블 생성 안 됨</text>
+</g>
+<g>
+  <rect class="box" x="1210" y="300" width="240" height="74" rx="8"></rect>
+  <rect class="hd" x="1210" y="300" width="240" height="26" rx="8"></rect><rect class="hd" x="1210" y="313" width="240" height="13"></rect>
+  <text class="tbl-h" x="1220" y="317">traffic_metric_daily</text>
+  <text class="tbl-pk" x="1220" y="340">PK (metric_date, risk)</text>
+  <text class="tbl-r" x="1220" y="358">count INTEGER DEFAULT 0</text>
+</g>
+
+<!-- ============ connectors ============ -->
+<!-- auth bus: oauth_identities & sessions -> users (CASCADE) -->
+<path d="M250,244 L270,244 L270,114 L252,114" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<path d="M250,365 L270,365 L270,114 L252,114" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- screening.user_id -> users (SET NULL) -->
+<path d="M290,90 L252,90" fill="none" stroke="var(--warn)" stroke-width="1.6" marker-end="url(#arWn)"></path>
+<!-- claim -> screening -->
+<path d="M395,180 L395,162" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- judgment -> claim -->
+<path d="M395,292 L395,274" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- judgment_evidence -> judgment -->
+<path d="M395,440 L395,404" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- suggestion -> judgment -->
+<path d="M620,440 L620,380 L502,380" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- feedback(live) -> judgment -->
+<path d="M840,440 L840,355 L502,355" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- guardrail_event -> judgment -->
+<path d="M1065,440 L1065,325 L502,325" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- judgment_evidence -> master fan (dashed, no FK) -->
+<path d="M395,550 L395,570" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3"></path>
+<path d="M395,570 L380,588" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arMu)"></path>
+<path d="M395,570 L585,588" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arMu)"></path>
+<path d="M395,570 L815,588" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arMu)"></path>
+<text class="lbl" x="405" y="580">evidence_type 판별 참조, FK 없음</text>
+<!-- screening_history.user_id -> users (CASCADE, top bus) -->
+<path d="M1210,75 L1210,25 L135,25 L135,52" fill="none" stroke="var(--azure)" stroke-width="1.6" marker-end="url(#arAz)"></path>
+<!-- screening_history.screening_id ~ screening (dashed, no FK) -->
+<path d="M1210,130 L502,130" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arMu)"></path>
+<text class="lbl" x="760" y="124">screening_id — FK 아님(논리참조)</text>
+<!-- feedback(dead) <-> screening_history intended FK (dashed danger) -->
+<path d="M1330,180 L1330,162" fill="none" stroke="var(--danger)" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arDg)"></path>
+<!-- collision link feedback(dead) <-> feedback(live) -->
+<path d="M1210,226 L1180,226 L1180,560 L942,560 L942,534" fill="none" stroke="var(--danger)" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arDg)"></path>
+<text class="tbl-warn" x="960" y="576">⚠ 동일 테이블명 충돌 — quality.py가 먼저 실행되어 이 스키마만 생성</text>
+
+<!-- legend -->
+<g>
+  <line x1="20" y1="800" x2="55" y2="800" stroke="var(--azure)" stroke-width="1.8" marker-end="url(#arAz)"></line>
+  <text class="lbl" x="62" y="804">FK, ON DELETE CASCADE</text>
+  <line x1="260" y1="800" x2="295" y2="800" stroke="var(--warn)" stroke-width="1.8" marker-end="url(#arWn)"></line>
+  <text class="lbl" x="302" y="804">FK, ON DELETE SET NULL</text>
+  <line x1="530" y1="800" x2="565" y2="800" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arMu)"></line>
+  <text class="lbl" x="572" y="804">설계상 FK 없음(논리 참조)</text>
+  <line x1="800" y1="800" x2="835" y2="800" stroke="var(--danger)" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#arDg)"></line>
+  <text class="lbl" x="842" y="804">테이블명 충돌 / 의도했으나 미생성</text>
+</g>
+<text class="lbl" x="20" y="835">PK=주황 텍스트, FK=하늘색 텍스트. 박스 배치는 db/schema/*.py 파일 단위로 그룹화(좌: auth, 중앙: core+quality, 하단: master, 우: screening_history+traffic_metric).</text>
+</svg>

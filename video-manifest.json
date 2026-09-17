@@ -1,0 +1,17 @@
+{
+  "jjirit": {
+    "source": "프로젝트\\1차프로젝트 찌릿\\시연영상.mp4",
+    "duration": 105.5,
+    "bytes": 2879010
+  },
+  "jangbumi": {
+    "source": "프로젝트\\3차프로젝트 장부미\\시연영상.mp4",
+    "duration": 144.708333,
+    "bytes": 13373185
+  },
+  "adclear": {
+    "source": "프로젝트\\2차프로젝트 AD-CLEAR\\시연영상.mp4",
+    "duration": 569.133333,
+    "bytes": 20604187
+  }
+}
