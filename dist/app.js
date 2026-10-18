@@ -161,24 +161,24 @@ function enhanceAdclearDetails() {
         <div class="tags"><span>PostgreSQL</span><span>asyncpg</span><span>FastAPI</span><span>Pydantic</span><span>Azure Blob Storage</span><span>Azure AI Search</span></div>
       </header>
 
-      <section id="adclear-normalize" class="case-step ad-section">
+      <section id="adclear-normalize" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">01 / DATA NORMALIZATION</span><h4>JSON 데이터 정규화</h4><p>법령·사례·판례 데이터를 팀 공용 스키마에 맞춰 정규화했습니다. 중첩 JSON을 평면 레코드로 바꾸고, 사례의 법령 참조 배열과 판례의 사건번호·청크 ID를 구분해 검색 결과가 원문으로 연결되도록 정리했습니다.</p></div>
         <ol class="read-flow"><li><span class="flow-number">01</span><strong>중첩 JSON</strong><small>여러 층에 나뉜 본문과 참조</small></li><li><span class="flow-number">02</span><strong>평면 레코드</strong><small>본문 · 식별자 · 원문 참조</small></li><li><span class="flow-number">03</span><strong>검색용 데이터</strong><small>법령 · 사례 · 판례</small></li></ol>
       </section>
 
-      <section id="adclear-rag" class="case-step ad-section">
+      <section id="adclear-rag" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">02 / RAG DEPLOYMENT</span><h4>Azure AI Search 인덱싱·RAG 배포</h4><p>법령·사례·판례 인덱스 구성과 인덱싱, RAG 배포에 공동 참여했습니다. 정규화한 본문과 벡터 필드를 연결하고 실제 광고 문구로 관련 근거가 검색되는지 확인했습니다.</p><p>팀 공용 스키마는 검색 본문 <code>text</code>를 <code>text-embedding-3-large</code>로 변환해 3,072차원 <code>content_vector</code>에 담습니다. 텍스트는 한국어 분석기 <code>ko.lucene</code>로 검색하며, 팀 검색 설계는 BM25와 벡터 검색을 함께 사용해 단어 일치와 의미 유사성을 보완합니다.</p></div>
         <ol class="read-flow"><li><span class="flow-number">01</span><strong>정규화 JSON</strong><small>검색할 본문과 참조 ID</small></li><li><span class="flow-number">02</span><strong>3,072차원 임베딩</strong><small>text-embedding-3-large</small></li><li><span class="flow-number">03</span><strong>키워드 + 벡터 검색</strong><small>Azure AI Search · 관련 근거 반환</small></li></ol>
         <div class="decision-note wide"><b>검색 단위</b><span>법령·사례·판례는 근거 종류로 구분합니다. 공용 스키마는 식품표시광고법 제8조를 ‘호’ 단위로 나누어 ‘질병 예방·치료’, ‘의약품 오인’ 같은 규칙을 개별 근거로 찾도록 정리했습니다. 사례에는 여러 법령을 연결할 수 있는 law_refs 배열을 둡니다.</span></div>
       </section>
 
-      <section id="adclear-search-fix" class="case-step ad-section">
+      <section id="adclear-search-fix" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">03 / SEARCH TROUBLESHOOTING</span><h4>중첩 JSON으로 발생한 청킹·검색 문제 해결</h4><p>인덱싱은 완료됐지만 광고 문구에 맞는 법령이 검색되지 않았습니다. Azure 설정과 청킹 결과를 단계적으로 확인해 당시 마법사의 처리 방식과 중첩 JSON 구조가 맞지 않는 문제를 찾았습니다. 데이터를 평탄화한 뒤 같은 문구로 재검색해 관련 법령이 반환되는 것을 확인했습니다.</p></div>
-        <ol class="ad-troubleshoot"><li><i aria-hidden="true">!</i><b>검색 불일치</b><span>인덱싱 완료<br>근거는 부정확</span></li><li><i aria-hidden="true">⌕</i><b>원인 추적</b><span>Azure 설정<br>청킹 결과 점검</span></li><li><i aria-hidden="true">{ }</i><b>구조 수정</b><span>중첩 JSON<br>평면 레코드</span></li><li><i aria-hidden="true">✓</i><b>재검색 확인</b><span>같은 광고 문구로<br>관련 법령 검색</span></li></ol>
+        <ol class="rag-troubleshoot"><li><i aria-hidden="true">!</i><b>검색 불일치</b><span>인덱싱 완료<br>근거는 부정확</span></li><li><i aria-hidden="true">⌕</i><b>원인 추적</b><span>Azure 설정<br>청킹 결과 점검</span></li><li><i aria-hidden="true">{ }</i><b>구조 수정</b><span>중첩 JSON<br>평면 레코드</span></li><li><i aria-hidden="true">✓</i><b>재검색 확인</b><span>같은 광고 문구로<br>관련 법령 검색</span></li></ol>
         <p class="source-note wide">본인 회고 기반 해결 과정입니다.</p>
       </section>
 
-      <section id="adclear-model" class="case-step ad-section">
+      <section id="adclear-model" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">04 / DATA MODEL</span><h4>PostgreSQL 데이터 모델링 · 15개 테이블 설계</h4><p>검사 원문, 개별 주장, 판정, 인용 근거와 대체문구를 관계로 연결했습니다. 어떤 주장에 어떤 판정과 근거가 붙었는지 조회할 수 있도록 설계했고, 마스터 데이터는 판정 기록과 구분해 관리했습니다.</p><p>발표자료 기준 제 설계 범위는 런타임 5개, 유저·이력 4개, 마스터 3개, 품질 2개, 대시보드 1개입니다.</p></div>
         <div class="read-model" aria-label="판정 기록의 핵심 데이터 관계">
 <p class="diagram-label">판정 기록의 관계</p>
@@ -188,7 +188,7 @@ function enhanceAdclearDetails() {
 <div class="model-groups"><details><summary>사용자·이력</summary><p>사용자, 로그인 정보, 세션과 검사 이력을 관리합니다.</p></details><details><summary>판정 기록</summary><p>검사·주장·판정에 인용 근거와 대체문구를 연결합니다.</p></details><details><summary>근거 원문</summary><p>법령·사례·판례 마스터를 원문 식별자로 관리하고 갱신합니다.</p></details></div>
       </section>
 
-      <section id="adclear-persist" class="case-step ad-section">
+      <section id="adclear-persist" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">05 / ASYNCPG TRANSACTION</span><h4>asyncpg 트랜잭션 기반 판정 결과 저장</h4><p>AI 판정 결과의 형식과 참조 관계를 검사한 뒤 검사·주장·판정·근거 기록을 하나의 트랜잭션으로 저장했습니다. 모두 성공하면 확정하고, 중간 SQL 오류가 발생하면 이번 트랜잭션에서 쓴 내용을 모두 취소하도록 구성했습니다.</p></div>
         <div class="read-transaction">
 <div class="tx-intake"><strong>AI 판정 결과 수신</strong><small>형식과 참조 관계 검사</small></div>
@@ -196,7 +196,7 @@ function enhanceAdclearDetails() {
 <div class="transaction-scope"><p class="diagram-label">하나의 DB 트랜잭션</p><ol class="read-flow"><li><span class="flow-number">01</span><strong>검사 기록</strong><small>screening</small></li><li><span class="flow-number">02</span><strong>개별 주장</strong><small>claim</small></li><li><span class="flow-number">03</span><strong>판정·근거</strong><small>judgment · evidence</small></li></ol><div class="transaction-outcomes"><div><b>모두 성공 → COMMIT</b><span>이번 저장 확정</span></div><div><b>중간 SQL 오류 → ROLLBACK</b><span>이 묶음에서 쓴 변경을 모두 취소</span></div></div></div></div>
       </section>
 
-      <section id="adclear-sync" class="case-step ad-section">
+      <section id="adclear-sync" class="case-step rag-section">
         <div class="case-copy"><span class="step-index">06 / MASTER SYNC</span><h4>Pydantic 검증·UPSERT 기반 마스터 동기화 자동화</h4><p>Blob Storage의 법령·사례·판례 JSON을 내려받아 필수값과 자료형, 중복 ID를 검증하고 PostgreSQL 마스터에 UPSERT하는 절차를 코드로 구성했습니다. 원본이 바뀌면 같은 절차를 다시 실행해 신규 데이터는 추가하고 기존 ID의 내용은 갱신할 수 있습니다.</p></div>
         <div class="read-sync"><p class="diagram-label">원본 변경 후 동기화 실행</p><ol class="read-flow"><li><span class="flow-number">01</span><strong>Blob JSON</strong><small>공통 원본 다운로드</small></li><li><span class="flow-number">02</span><strong>Pydantic 검증</strong><small>필수값 · 자료형 · 중복 ID</small></li><li><span class="flow-number">03</span><strong>UPSERT</strong><small>새 ID는 추가 · 기존 ID는 갱신</small></li><li><span class="flow-number">04</span><strong>PostgreSQL</strong><small>마스터 데이터 반영</small></li></ol><p class="diagram-note">검증·갱신 절차를 코드로 자동화했습니다.</p></div>
         <aside class="azure-note"><span>AZURE TROUBLESHOOTING</span><h5>Azure Blob 403 접근 오류 점검</h5><p>Owner 역할은 리소스 관리 권한이므로 실제 파일 읽기 권한과 구분했습니다. 요청 인증 방식, Blob 데이터 접근 권한, SAS 범위와 유효기간을 함께 점검했습니다.</p></aside>

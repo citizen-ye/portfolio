@@ -16,6 +16,8 @@ for (const asset of ['adclear.svg', 'adclear-data-layer.svg', 'adclear-source-no
 assert.match(html, /id="project-rag"[\s\S]*adclear-data-layer\.svg/);
 assert.match(app, /function enhanceAdclearDetails\(\)/);
 assert.match(app, /class="adclear-case-study"/);
+assert.doesNotMatch(app + css, /\bad-(?:section|schema|troubleshoot|sync-flow|transaction)\b/, 'Project layout classes must not look like advertisement containers');
+assert.equal((app.match(/class="case-step rag-section"/g) ?? []).length, 6, 'All six RAG detail sections must remain present');
 for (const id of ['adclear-normalize', 'adclear-rag', 'adclear-search-fix', 'adclear-model', 'adclear-persist', 'adclear-sync']) {
   assert.equal((app.match(new RegExp(`id="${id}"`, 'g')) ?? []).length, 1, `${id} must exist once`);
 }
